@@ -6,13 +6,21 @@
         $doc_number = $_POST['doc_number'];
         //$doc_email = $_POST['doc_ea']
         $doc_pwd = sha1(md5($_POST['doc_pwd']));//double encrypt to increase security
-        $stmt=$mysqli->prepare("SELECT doc_number, doc_pwd, doc_id FROM his_docs WHERE  doc_number=? AND doc_pwd=? ");//sql to log in user
+        $stmt=$mysqli->prepare("SELECT doc_number, doc_pwd, doc_id, doc_dept FROM his_docs WHERE  doc_number=? AND doc_pwd=? ");////sql to log in user
         $stmt->bind_param('ss', $doc_number, $doc_pwd);//bind fetched parameters
         $stmt->execute();//execute bind
-        $stmt -> bind_result($doc_number, $doc_pwd ,$doc_id);//bind result
+        $stmt -> bind_result($doc_number, $doc_pwd ,$doc_id, $doc_dept);//bind result
         $rs=$stmt->fetch();
         $_SESSION['doc_id'] = $doc_id;
         $_SESSION['doc_number'] = $doc_number;//Assign session to doc_number id
+        // Normalize department to permission key set
+        if(isset($doc_dept)) {
+            $normalized = $doc_dept;
+            // Map various clinical department labels into 'Clinical'
+            $clinicalAliases = ['Surgery | Theatre','General Medicine','Outpatient','Inpatient','Emergency','Paediatrics'];
+            if(in_array($doc_dept, $clinicalAliases, true)) { $normalized = 'Clinical'; }
+            $_SESSION['dept'] = $normalized; // used by permissions.php
+        }
         //$uip=$_SERVER['REMOTE_ADDR'];
         //$ldate=date('d/m/Y h:i:s', time());
         if($rs)
