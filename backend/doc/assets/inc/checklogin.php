@@ -9,5 +9,10 @@ if(strlen($_SESSION['doc_id'])==0)
 		$_SESSION["doc_id"]="";
 		header("Location: http://$host$uri/$extra");
 	}
+    // After login check, enforce department-based permissions
+    require_once(__DIR__ . '/permissions.php');
+    if(function_exists('doc_check_permission_or_redirect')){
+        doc_check_permission_or_redirect();
+    }
 }
 ?>
