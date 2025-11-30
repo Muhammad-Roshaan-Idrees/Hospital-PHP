@@ -150,7 +150,7 @@
        
         <!-- Right bar overlay-->
         <div class="rightbar-overlay"></div>
-        <script src="//cdn.ckeditor.com/4.6.2/basic/ckeditor.js"></script>
+        <script src="//cdn.ckeditor.com/41.1.0/basic/ckeditor.js"></script>
         <script type="text/javascript">
         CKEDITOR.replace('editor')
         </script>
