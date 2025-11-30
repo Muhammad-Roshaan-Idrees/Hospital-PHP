@@ -1,7 +1,150 @@
-(function($) {
-    "use strict"
-    jQuery(document).ready(function() {
+(function ($) {
+    "use strict";
 
+    // Existing initializations remain intact
+
+    // Inject minimal CSS for interactive UI to avoid editing stylesheets
+    (function injectStyles(){
+        const css = `
+        :root{--his-bg:#ffffff;--his-fg:#222222;--his-muted:#666666;--his-accent:#2c7be5;--his-surface:#f5f7fb}
+        .dark-mode{--his-bg:#101317;--his-fg:#e6e6e6;--his-muted:#9aa4b2;--his-accent:#7ab3ff;--his-surface:#1a1f26}
+        body{background-color:var(--his-bg);color:var(--his-fg)}
+        /* Appearance polish */
+        .single-feature,.patient-area .single-patient,.specialist-area .content-area,.blog_right_sidebar{border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
+        .single-feature:hover,.patient-area .single-patient:hover,.specialist-area .content-area:hover{box-shadow:0 10px 24px rgba(0,0,0,0.12)}
+        .template-btn{border-radius:10px;transition:transform .15s ease, filter .15s ease}
+        .template-btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+        #header.header-scrolled{backdrop-filter:saturate(1.1) blur(8px);background:rgba(249,249,253,0.7)}
+        a{transition:color .15s ease, opacity .15s ease}
+        a:hover{opacity:.9}
+        /* Injected interactive UI */
+        .his-floating-toggle{position:fixed;bottom:20px;right:20px;z-index:9999;border:none;background:var(--his-surface);color:var(--his-fg);box-shadow:0 6px 16px rgba(0,0,0,0.15);padding:10px 12px;border-radius:10px;cursor:pointer}
+        .his-floating-toggle:hover{filter:brightness(1.05)}
+        .his-back-to-top{position:fixed;bottom:20px;right:70px;z-index:9999;border:none;background:var(--his-accent);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,0.15);padding:10px 12px;border-radius:10px;cursor:pointer}
+        .his-back-to-top:hover{filter:brightness(1.05)}
+        .his-toast{position:fixed;bottom:80px;right:20px;z-index:9999;background:var(--his-surface);color:var(--his-fg);border:1px solid rgba(0,0,0,0.08);box-shadow:0 6px 16px rgba(0,0,0,0.15);padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(8px);transition:opacity .2s ease, transform .2s ease}
+        .his-toast.show{opacity:1;transform:translateY(0)}
+        .his-table-search-wrapper{display:flex;justify-content:flex-end;margin:10px 0}
+        .his-table-search{max-width:260px;width:100%;background:var(--his-surface);color:var(--his-fg);border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:8px 10px}
+        `;
+        const style = document.createElement('style');
+        style.setAttribute('data-his', 'interactive');
+        style.textContent = css;
+        document.head.appendChild(style);
+    })();
+
+    // 1) Dark Mode Toggle (injected, no HTML changes needed)
+    const THEME_KEY = "his_theme";
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    const effectiveDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark-mode', dark);
+        localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+    }
+    applyTheme(effectiveDark);
+
+    function createThemeToggle() {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Toggle dark mode');
+        btn.className = 'his-floating-toggle';
+        btn.innerHTML = effectiveDark ? '☀️' : '🌙';
+        btn.addEventListener('click', () => {
+            const nowDark = !document.documentElement.classList.contains('dark-mode');
+            applyTheme(nowDark);
+            btn.innerHTML = nowDark ? '☀️' : '🌙';
+            showToast(nowDark ? 'Dark mode enabled' : 'Light mode enabled');
+        });
+        document.body.appendChild(btn);
+    }
+
+    // 2) Back-to-top button (smooth scroll)
+    function createBackToTop() {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Back to top');
+        btn.className = 'his-back-to-top';
+        btn.textContent = '↑';
+        btn.style.display = 'none';
+        btn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.body.appendChild(btn);
+
+        window.addEventListener('scroll', () => {
+            const show = window.scrollY > 300;
+            btn.style.display = show ? 'block' : 'none';
+        });
+    }
+
+    // 3) Lightweight toast notifications
+    let toastTimer;
+    function showToast(message) {
+        let toast = document.getElementById('his-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'his-toast';
+            toast.className = 'his-toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // 4) Auto-injected table search (filters visible rows)
+    function injectTableSearch() {
+        const tables = document.querySelectorAll('table');
+        if (!tables.length) return;
+        tables.forEach((table) => {
+            // Skip if already has a search attached
+            if (table.dataset.hisSearch === '1') return;
+            table.dataset.hisSearch = '1';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'his-table-search-wrapper';
+            const input = document.createElement('input');
+            input.type = 'search';
+            input.placeholder = 'Search table…';
+            input.className = 'his-table-search';
+            wrapper.appendChild(input);
+            table.parentNode.insertBefore(wrapper, table);
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            input.addEventListener('input', () => {
+                const q = input.value.trim().toLowerCase();
+                rows.forEach((tr) => {
+                    const text = tr.textContent.toLowerCase();
+                    tr.style.display = text.includes(q) ? '' : 'none';
+                });
+            });
+        });
+    }
+
+    // 5) Enhance existing anchors with smooth scroll if hash
+    function enableSmoothAnchorScroll() {
+        document.addEventListener('click', function (e) {
+            const a = e.target.closest('a[href^="#"]');
+            if (!a) return;
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+
+    // Initialize after DOM ready
+    $(function () {
+        createThemeToggle();
+        createBackToTop();
+        injectTableSearch();
+        enableSmoothAnchorScroll();
+    });
+})(jQuery);
         // Initiate superfish on nav menu
         $('.nav-menu').superfish({
             animation: {
