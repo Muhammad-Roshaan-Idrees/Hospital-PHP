@@ -29,7 +29,7 @@
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
     
 <?php include('assets/inc/head.php');?>
 
