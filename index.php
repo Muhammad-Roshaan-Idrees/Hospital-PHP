@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <!-- Page Title -->
-    <title>HOSPITAL MANAGEMENT SYSTEM</title>
+    <title>Hospital Management System</title>
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="assets/images/logo/favicon.png" type="image/x-icon">
@@ -40,7 +40,7 @@
                     <ul class="nav-menu">
                         <li class="menu-active"><a href="index.php">Home</a></li>
                         <li><a href="backend/doc/index.php">Doctor's Login</a></li>
-                        <li><a href="backend/admin/index.php">Admin Login</a></li>
+                        <li><a href="backend/admin/index.php">Administrator Login</a></li>
                     </ul>
                 </nav><!-- #nav-menu-container -->		    		
                 </div>
