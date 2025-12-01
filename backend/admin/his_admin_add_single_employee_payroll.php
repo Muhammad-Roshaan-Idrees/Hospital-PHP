@@ -36,7 +36,7 @@
 <!--End Server Side-->
 <!--End Patient Registration-->
 <!DOCTYPE html>
-<html lang="en">
+<html>
     
     <!--Head-->
     <?php include('assets/inc/head.php');?>
