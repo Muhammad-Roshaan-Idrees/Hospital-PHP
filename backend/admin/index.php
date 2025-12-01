@@ -110,7 +110,7 @@
 
                                 </form>
 
-                                
+                                <!--
                                 For Now Lets Disable This 
                                 This feature will be implemented on later versions
                                 <div class="text-center">
@@ -130,9 +130,9 @@
                                         </li>
                                     </ul>
                                 </div> 
-                                
+                                -->
 
-                            </div> <!-- end card-body -->
+                            </div> 
                         </div>
                         <!-- end card -->
 
