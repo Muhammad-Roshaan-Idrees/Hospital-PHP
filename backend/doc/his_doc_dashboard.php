@@ -8,7 +8,7 @@
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
     
     <!--Head Code-->
     <?php include("assets/inc/head.php");?>
