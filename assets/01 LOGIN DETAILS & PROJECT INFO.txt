@@ -1,7 +1,5 @@
 **Database Name: hmisphp**
 
-**Developed by Muhammad Roshaan Idrees**
-
 **Recommended PHP Version 5.6, 7.4**
 
 
